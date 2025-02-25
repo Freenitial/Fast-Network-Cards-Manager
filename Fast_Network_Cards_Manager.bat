@@ -1,4 +1,5 @@
 <# :
+    REM Author: Leo Gillet - Freenitial on GitHub
     @echo off & chcp 437 >nul & Title Fast Network Cards Manager
     copy /y "%~f0" "%TEMP%\%~n0.ps1" >NUL && powershell -Nologo -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%TEMP%\%~n0.ps1" -Verb Runas
     exit /b
@@ -41,6 +42,7 @@ $tableLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Win
 $form.Controls.Add($tableLayout)
 
 $listView = New-Object System.Windows.Forms.ListView
+$listView.Sorting = [System.Windows.Forms.SortOrder]::Ascending
 $listView.View = 'Details'
 $listView.FullRowSelect = $true
 $listView.GridLines = $true
@@ -115,11 +117,12 @@ function Reset-AdapterList {
             $item.Tag = $adapter
             $listView.Items.Add($item) | Out-Null
         }
+        $listView.Sort()
     } catch {
         [System.Windows.Forms.MessageBox]::Show("Error retrieving network adapters: $_", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
     }
 }
-Reset-AdapterList
+$buttonRefresh.Add_Click({ Reset-AdapterList })
 
 function Update-ProgressBar {
     param([int]$progress)
@@ -152,8 +155,6 @@ $processTimer.add_Tick({
     }
 })
 
-$buttonRefresh.Add_Click({ Reset-AdapterList })
-
 function Update-Adapters {
     param(
         [ScriptBlock]$Filter,
@@ -179,7 +180,6 @@ function Update-Adapters {
 
 $buttonDisableAll.Add_Click({ Update-Adapters { param($adapter) $adapter.Status -eq "Up" } "Disable" "No active network adapters found." })
 $buttonEnableAll.Add_Click({ Update-Adapters { param($adapter) $adapter.Status -ne "Up" } "Enable" "No disabled network adapters found." })
-
 $buttonDisableSelection.Add_Click({
     Update-Adapters {
         param($adapter)
@@ -195,6 +195,6 @@ $buttonEnableSelection.Add_Click({
     } "Enable" "No applicable selected adapters found."
 })
 
+Reset-AdapterList
 [System.Windows.Forms.Application]::Run($form)
-
 if ($PSCommandPath) { Remove-Item $PSCommandPath -Force }
