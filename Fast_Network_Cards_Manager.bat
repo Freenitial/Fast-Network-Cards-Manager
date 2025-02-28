@@ -1,7 +1,7 @@
 <# :
     REM Author: Leo Gillet - Freenitial on GitHub
     @echo off & chcp 437 >nul & Title Fast Network Cards Manager
-    copy /y "%~f0" "%TEMP%\%~n0.ps1" >NUL && powershell -Nologo -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%TEMP%\%~n0.ps1" -Verb Runas
+    copy /y "%~f0" "%TEMP%\%~n0.ps1" >NUL && powershell -Nologo -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%TEMP%\%~n0.ps1"
     exit /b
 #>
 
